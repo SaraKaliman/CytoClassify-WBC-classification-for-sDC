@@ -24,11 +24,11 @@ from util.plotting_funct import plot_line_for_time
 
 class wbc_classifier:
 
-    def __init__(self, rtdc_files_folder, file_name,
+    def __init__(self, rtdc_files_folder,
+                 file_name,
                  output_folder,
                  export_fname,
                  out_scalar_feat,
-                 add_basin_feat,
                  df_count=None):
 
         self.fname = file_name
@@ -46,7 +46,6 @@ class wbc_classifier:
         self.perceed = True
 
     def filter_wbc(self):
-        print("WBC filering started")
         fname = "wbc_" + self.export_fname
         fpath = Path(self.output_folder) / fname
         excel_file_name = "wbc_count_table_" + \
@@ -83,7 +82,9 @@ class wbc_classifier:
 
         indexes_selected = np.where(boolian_indexes == True)[0]
         print("Step1: WBC box-filters is done.")
+
         # save wbc
+        # cell indexes from the original rtdc file are saved as userdef0 feat
         dclab.set_temporary_feature(rtdc_ds=ds_wbc,
                                     feature="userdef0",
                                     data=indexes_selected)
@@ -125,7 +126,7 @@ class wbc_classifier:
         subset_indexes_to_select = (df["Clusters"] == wbc_label).values
         ds_wbc = filter_manual(ds_wbc, subset_indexes_to_select)
         wbc_indexes = indexes_selected[subset_indexes_to_select]
-        print("Step2: WBC cleaning from RBC-doublets done.")
+        print("Step2a: WBC cleaning from RBC-doublets done.")
 
         if len(ds_wbc["area_um"]) < 300:
             self.perceed = False
@@ -138,7 +139,7 @@ class wbc_classifier:
                                               min_vals=[-10, 0.06],
                                               max_vals=[15, 0.26])
         wbc_indexes = wbc_indexes[boolian_indexes]
-        print("Step2: WBC box-filters for stiff RBC and micro-clots done.")
+        print("Step2b: WBC box-filters for stiff RBC and micro-clots done.")
 
         # save wbc
         dclab.set_temporary_feature(rtdc_ds=ds_wbc,
@@ -164,7 +165,7 @@ class wbc_classifier:
 
     def cluster_wbc(self):
         save_unclean_lym = True
-        print("WBC clustering started")
+        print("Step3: separating lymphocytes started")
         if self.perceed:
             # read WBC file
             file_name = "wbc_" + self.export_fname
@@ -205,7 +206,7 @@ class wbc_classifier:
                           filtered=True,
                           features=self.new_features,
                           override=True)
-        print("Granulocytes and Monocytes after step3 saved as", file_name)
+        print("Granulocytes and Monocytes saved as", file_name)
         N_gm = len(gm_indexes)
         self.df_count.loc["Count", "Granulo-Monocytes"] = N_gm
 
@@ -225,7 +226,7 @@ class wbc_classifier:
                                filtered=True,
                                features=self.new_features,
                                override=True)
-            print("Lymphocytes after step 3 saved as", file_name)
+            print("Unclean Lymphocytes saved as", file_name)
 
         # Clean Lymphocytes from micro-clots and stiff RBC
         boolian_indexes, ds_lym = filter_rtdc(ds_lym,
@@ -289,7 +290,7 @@ class wbc_classifier:
         ds_clean_lym.close()
 
     def cluster_gm(self, gmm_covar="full"):
-        print("Granulocytes and Monocytes clustering started")
+        print("Steps 5&6 started")
         if self.perceed:
             # read GM file
             file_name = "Step3_gm_" + self.export_fname
@@ -495,6 +496,7 @@ def read_main_rtdc_file(rtdc_file_name, scalar_feat):
         return ds, new_features, good_rtdc
 
     new_features = list(ds.features_innate)
+    # userdef0 feat is used to save cell indexes from the original rtdc file
     new_features.append("userdef0")
 
     if scalar_feat:
