@@ -18,13 +18,7 @@ if __name__ == '__main__':
 
     # Chose weather you want to output cell images
     # exporting images takes time, it is faster to export scalar feat
-    Output_only_scalar_features = True   # set True to not export images
-
-    # If you export only scalar features you can add basins
-    # They will point to the cell image using event index and
-    # path of the original rt-dc file.
-    # You need new ShapeOut2 to use basins
-    Add_basins = False
+    output_without_cell_images = True   # set True to not export images
 
     os.chdir(rtdc_files_folder)
 
@@ -41,9 +35,9 @@ if __name__ == '__main__':
         output_folder = output_folder / new_subfol_name
         os.chdir(rtdc_files_folder)
         file_subfolder = Path()
-        run_classification(rtdc_files_folder, file_name,
+        run_classification(rtdc_files_folder,
+                           file_name,
                            output_folder,
                            export_fname,
-                           out_scalar_feat=Output_only_scalar_features,
-                           add_basin_feat=Add_basins)
+                           out_scalar_feat=output_without_cell_images)
 
