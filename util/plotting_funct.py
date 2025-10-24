@@ -84,24 +84,6 @@ def plot_time_and_feature(ds, feat):
     plt.plot([df["time"].min(), df["time"].max()],
              [df[feat].mean(), df[feat].mean()], color="k")
 
-    # Plot angle and p-val
-    # import statsmodels.api as sm
-    # Y = df[feat]
-    # X = df["time"]
-    # X = sm.add_constant(X)
-    # mod = sm.OLS(Y, X)
-    # fii = mod.fit()
-    # p_values = fii.summary2().tables[1]['P>|t|']
-    # coef = fii.summary2().tables[1]['Coef.']
-    # x_pos = df["time"].max()
-    # y_pos = df[feat].max()
-    # plt.text(x_pos, y_pos, "angle=" +
-    #          str(round(np.arctan(coef["time"])*180/np.pi, 2)) + "°" +
-    #          " p-val=" + "{:.4f}".format(p_values["time"]),
-    #          horizontalalignment='right',
-    #          size='large',
-    #          color='black')
-
 
 def plot_line_for_time(ds, feat):
     N = len(ds["time"])

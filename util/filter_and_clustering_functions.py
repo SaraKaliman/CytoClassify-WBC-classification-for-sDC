@@ -15,7 +15,6 @@ from sklearn.mixture import GaussianMixture
 from sklearn.cluster import KMeans
 
 
-
 def filter_rtdc(ds, filter_names, min_vals, max_vals):
     bool_ind_selected = np.ones(len(ds["index"]), dtype=bool)
     for feat, min_val, max_val in zip(filter_names, min_vals, max_vals):
